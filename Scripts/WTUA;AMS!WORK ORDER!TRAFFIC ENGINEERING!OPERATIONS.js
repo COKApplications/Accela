@@ -1,0 +1,40 @@
+/**
+ * The below code is related to the AMS/Work Order/TRAFFIC ENGINEERING/OPERATIONS record, with
+ * a WorkflowTaskUpdateAfter event. 
+ */
+
+var parentRecord = getParent();
+
+if(isEmpty(parentRecord) == false) {
+	//Start Script 16 - Update Service Request Parent Status
+	if (wfTask == "Open" && (wfStatus == "Canceled" || wfStatus == "Closed")) {
+                checkRelatedAndCloseSR ();
+                checkRelatedENFAndCloseENF ();
+                deactivateTask("Closed");
+
+    	}
+}
+	//End Script 16
+
+
+if((wfTask == "Open") && (wfStatus == "In Queue")){
+for (i in wfObj) {
+   fTask = wfObj[i];
+   if (fTask.getTaskDescription().equals(wfTask) && 
+      (fTask.getProcessID() == wfProcessID)) {
+       wfAssignedStaff = fTask.getTaskItem().getAssignedUser();
+      var taskAssignUser = aa.person.getUser(fTask.getAssignedStaff().getFirstName(),fTask.getAssignedStaff().getMiddleName(),fTask.getAssignedStaff().getLastName()).getOutput();
+      if (taskAssignUser != null)
+       {
+         // re-grabbing for userid.
+         wfUserObj = aa.person.getUser(fTask.getAssignedStaff().getFirstName(),fTask.getAssignedStaff().getMiddleName(),fTask.getAssignedStaff().getLastName()).getOutput();
+         v_userID = wfUserObj.getUserID();
+  	     assignCap(v_userID);
+             editAppSpecific("Assigned To", v_userID);
+      }
+ //     showMessage = true;
+ //     comment ("Workflow Assigned Staff=" + wfAssignedStaff);
+ //     comment ("Workflow Assigned StaffUserId=" + v_userID);
+}
+}
+}
